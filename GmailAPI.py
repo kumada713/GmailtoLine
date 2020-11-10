@@ -40,7 +40,7 @@ class GmailAPI:
                 #     "credentials.json", self._SCOPES
                 # )
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"), self._SCOPES
+                    os.environ.get("GOOGLE_CREDENTIALS"), self._SCOPES
                 )
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
