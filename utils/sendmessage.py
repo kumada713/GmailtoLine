@@ -1,13 +1,10 @@
 import os
 
-from dotenv import load_dotenv
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
 
-load_dotenv()
-
-channel_access_token = os.environ.get("CHANNEL_ACCESS_TOKEN")
-line_user_id = os.environ.get("LINE_USER_ID")
+channel_access_token = os.environ["CHANNEL_ACCESS_TOKEN"]
+line_user_id = os.environ["LINE_USER_ID"]
 line_bot_api = LineBotApi(channel_access_token)
 
 

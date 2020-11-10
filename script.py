@@ -1,16 +1,16 @@
 from __future__ import print_function
 
+import json
 import os.path
 import pickle
+import time
 
-from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from utils import sendmessage, time
-
-load_dotenv()
+from utils import sendmessage
+from utils import time as t
 
 
 class GmailAPI:
@@ -36,13 +36,15 @@ class GmailAPI:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", self._SCOPES
-                )
                 # flow = InstalledAppFlow.from_client_secrets_file(
-                #     os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"), self._SCOPES
+                #     "credentials.json", self._SCOPES
                 # )
-                creds = flow.run_local_server(port=0)
+                flow = InstalledAppFlow.from_client_config(
+                    json.loads(os.environ["GOOGLE_CREDENTIALS"]), self._SCOPES
+                )
+                # creds = flow.run_local_server(port=0)
+                creds = flow.run_console()
+
             # Save the credentials for the next run
             with open("token.pickle", "wb") as token:
                 pickle.dump(creds, token)
@@ -100,7 +102,7 @@ class GmailAPI:
             )
             for header in MessageDetail["payload"]["headers"]:
                 if header["name"] == "Date":
-                    row["Date"] = time.format_string_date(header["value"])
+                    row["Date"] = t.format_string_date(header["value"])
                 elif header["name"] == "From":
                     row["From"] = header["value"]
                 elif header["name"] == "Subject":
@@ -114,22 +116,24 @@ class GmailAPI:
 
 
 def main():
-    app = GmailAPI()
-    messages = app.GetMessageList(
-        # DateFrom=time.fetch_today(),
-        DateFrom="2020-11-10",
-        DateTo=None,
-        MessageFrom=os.environ.get("MESSAGE_FROM"),
-    )
+    while True:
+        app = GmailAPI()
+        messages = app.GetMessageList(
+            DateFrom=t.fetch_today(),
+            DateTo=None,
+            MessageFrom=os.environ["MESSAGE_FROM"],
+        )
 
-    for message in messages:
-        content = ""
-        content += message["From"] + "\n\n"
-        content += message["Date"] + "\n\n"
-        content += message["Subject"] + "\n\n"
-        content += message["Content"]
+        for message in messages:
+            content = ""
+            content += message["From"] + "\n\n"
+            content += message["Date"] + "\n\n"
+            content += message["Subject"] + "\n\n"
+            content += message["Content"]
 
-        sendmessage.push_message(content)
+            sendmessage.push_message(content)
+
+        time.sleep(60)
 
 
 if __name__ == "__main__":
