@@ -29,23 +29,19 @@ class GmailAPI:
         # created automatically when the authorization flow completes for the first
         # time.
         if os.path.exists("token.pickle"):
-            print("a")
             with open("token.pickle", "rb") as token:
                 creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
-            print("b")
             if creds and creds.expired and creds.refresh_token:
-                print("c")
                 creds.refresh(Request())
             else:
-                print("d")
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", self._SCOPES
-                )
                 # flow = InstalledAppFlow.from_client_secrets_file(
-                #     os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"), self._SCOPES
+                #     "credentials.json", self._SCOPES
                 # )
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"), self._SCOPES
+                )
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
             with open("token.pickle", "wb") as token:
@@ -120,7 +116,8 @@ class GmailAPI:
 def main():
     app = GmailAPI()
     messages = app.GetMessageList(
-        DateFrom=time.fetch_today(),
+        # DateFrom=time.fetch_today(),
+        DateFrom="2020-11-10",
         DateTo=None,
         MessageFrom=os.environ.get("MESSAGE_FROM"),
     )
