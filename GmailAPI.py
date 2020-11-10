@@ -3,14 +3,14 @@ from __future__ import print_function
 import os.path
 import pickle
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 from utils import sendmessage, time
 
-# load_dotenv()
+load_dotenv()
 
 
 class GmailAPI:
