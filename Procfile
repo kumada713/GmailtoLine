@@ -1,1 +1,1 @@
-web: python GmailAPI.py
+worker: python GmailAPI.py
